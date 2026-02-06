@@ -1,0 +1,46 @@
+name: Vorax News Digest
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 11 * * *"  # 08:00 São Paulo (UTC-3)
+    - cron: "0 21 * * *"  # 18:00 São Paulo (UTC-3)
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MAX_POSTS_PER_RUN: "4"
+          MAX_VLR_PER_RUN: "2"
+          MAX_THESPIKE_PER_RUN: "2"
+          LOG_LEVEL: "INFO"
+          TRANSLATE_PT: "1"
+          TRANSLATE_ONLY_VLR: "1"
+          EMBED_COLOR: "0"
+          VORAX_THUMB_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1469067511369826598/0205.gif"
+        run: python bot_noticias_digest_ptbr.py
+
+      - name: Commit state (anti-duplicado + mantém schedule ativo)
+        run: |
+          git config user.name "vorax-bot"
+          git config user.email "bot@vorax.local"
+          git add posted_cache.json translate_cache.json || true
+          git diff --cached --quiet || git commit -m "chore: update news cache"
+          git push
