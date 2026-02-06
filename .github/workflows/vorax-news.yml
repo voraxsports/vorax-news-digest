@@ -29,7 +29,7 @@ jobs:
 
       - name: Install deps
         run: |
-          pip install -r requirements.txt || pip install -r requirements
+          pip install -r requirements.txt
 
       - name: Run bot
         env:
@@ -41,10 +41,12 @@ jobs:
           TRANSLATE_PT: "1"
           TRANSLATE_ONLY_VLR: "1"
           EMBED_COLOR: "0"
-          VORAX_THUMB_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1469067511369826598/0205.gif"
+          BRAND_NAME: "Vorax eSports"
+          FOOTER_TEXT: "Vorax eSports • Notícias da Comunidade"
+          VORAX_LOGO_URL: "https://cdn.discordapp.com/attachments/1440760869964484738/1469322383449002004/vorax_icon_alt_on-ghost.png.png"
         run: python bot_noticias_digest_ptbr.py
 
-      - name: Commit state (anti-duplicado + mantém schedule ativo)
+      - name: Commit state (anti-duplicado)
         run: |
           git config user.name "vorax-bot"
           git config user.email "bot@vorax.local"
